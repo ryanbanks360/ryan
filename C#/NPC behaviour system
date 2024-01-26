@@ -1,0 +1,78 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class NpcMovement : MonoBehaviour
+{
+    private float horizontal;
+    public float speed = 8f;
+    public float jumpingPower = 20f;
+    private bool isFacingRight = true;
+    public float ncpmoverate;
+    private float nextnpcmove = 0.0f;
+
+    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private LayerMask OtherNpc; 
+    [SerializeField] private Transform NpcVision;
+    public Collider2D NpcMovementBoundary;
+    private Vector2 NpcBoundaryCenter;
+    private float NpcBoundaryRadius;
+    public Text Happiness;
+    public Transform TextPoint;
+
+    private void Start()
+    {
+
+        NpcBoundaryCenter = NpcMovementBoundary.bounds.center;
+        NpcBoundaryRadius = NpcMovementBoundary.bounds.extents.x;
+    }
+    void Update()
+    {
+
+
+        float move = Random.Range(-0.1f, 0.1f);
+        if ((move > 0.1f || move < 0.1f) && Time.time > nextnpcmove)
+        {
+            ncpmoverate = Random.Range(1, 5);
+            nextnpcmove = Time.time + ncpmoverate;
+            horizontal = move;
+        }
+
+        Npcnear();
+        Flip();
+    }
+
+    private void FixedUpdate()
+    {
+        Vector3 newPosition = transform.position + new Vector3(horizontal, 0, 0) * speed * Time.deltaTime;
+
+        float clampX = Mathf.Clamp(newPosition.x, NpcBoundaryCenter.x - NpcBoundaryRadius, NpcBoundaryCenter.x + NpcBoundaryRadius);
+
+        float currentY = transform.position.y;
+
+        transform.position = new Vector3(clampX, currentY, transform.position.z);
+    }
+
+    private void Npcnear()
+    {
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(NpcVision.position, 0.05f, OtherNpc);
+        if (colliders != null)
+        {
+
+        }
+    }
+
+    private void Flip()
+    {
+        if (isFacingRight && horizontal < 0f || !isFacingRight && horizontal > 0f)
+        {
+            isFacingRight = !isFacingRight;
+            Vector3 localScale = transform.localScale;
+            localScale.x *= -1f;
+            transform.localScale = localScale;
+        }
+    }
+
+}
