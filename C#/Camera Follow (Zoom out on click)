@@ -1,0 +1,41 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+public class CameraFollow : MonoBehaviour
+{
+    public Camera cam;
+    private float DefaultFOV = 90;
+    public Transform player;
+    public Vector3 offset = new Vector3(0f, 0f, -10f); // Offset to control the camera position relative to the player
+
+    [Range(0f, 1f)]
+    public float smoothSpeed = 0.125f; // Smoothing factor to control the camera movement
+    private int FovChange = 30;
+
+    private void Start()
+    {
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            float currentOrth = Camera.main.orthographicSize;
+
+            float newOrth = Mathf.Clamp(currentOrth + 1 , 1f, Mathf.Infinity);
+
+            Camera.main.orthographicSize = newOrth;
+        }
+    }
+    private void LateUpdate()
+    {
+        if (player != null)
+        {
+            Vector3 desiredPosition = player.position + offset;
+            Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
+            transform.position = smoothedPosition;
+        }
+    }
+
+}
+
